@@ -1,13 +1,15 @@
 import {Component, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
-import {MediaService} from "../services/media.service";
-import {ProvisionService} from "../services/provision.service";
+import {MediaService} from '../services/media.service';
+import {ProvisionService} from '../services/provision.service';
 import {WriteStream} from "fs";
+import {Readable} from "stream";
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss']
+  styleUrls: ['./home.component.scss'],
+  providers: [MediaService, ProvisionService]
 })
 export class HomeComponent implements OnInit {
   mainVolume;
@@ -17,24 +19,24 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {
     console.log('HomeComponent INIT');
-    this.getYoutubeDbs('tvQsyxLR7tk')
   }
 
-  getYoutubeDbs(YouTubeId: string) {
-
-    this.provisionService.getYouTubeVideo(YouTubeId)
+  downloadYoutubeVideo(youTubeId: string = 'tvQsyxLR7tk') {
+    this.provisionService.downloadVideo(youTubeId)
       .subscribe(
         (stream) => {
+          console.log(stream);
           console.log('VIDEO DATA is here');
-          this.analiseDbs(stream);
+          // TODO:  TO UPDATE WHEN TESTS ARE OK
+          // this.analiseDbs(stream);
         });
   }
 
-  analiseDbs(stream: WriteStream) {
+  analiseDbs(stream) {
     this.mediaService.getAudioVolumes(stream)
       .subscribe(
         (data) => {
-          this.mainVolume = data['mean_volume'];
+          this.mainVolume = data.meanVolume;
         });
   }
 

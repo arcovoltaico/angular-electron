@@ -1,8 +1,9 @@
 import {Injectable} from '@angular/core';
-import {NextObserver, Observable} from 'rxjs';
+import {NextObserver, Observable, of} from 'rxjs';
 import ffmpeg from 'fluent-ffmpeg-corrected';
 import * as ffmpegBin from 'ffmpeg-static-electron';
-import FS from "fs";
+import FS from 'fs';
+import {Readable} from 'stream';
 
 export interface IVolumes {
   meanVolume: string;
@@ -12,14 +13,19 @@ export interface IVolumes {
 
 @Injectable()
 export class MediaService {
-  getAudioVolumes(stream: FS.WriteStream): Observable<IVolumes> {
+  ffmpegPath = ffmpegBin.path
+    .replace('node_modules/electron/dist/Electron.app/Contents/Resources/electron.asar/renderer/bin', 'bin')
+    .replace('bin', 'node_modules/ffmpeg-static-electron/bin');
 
-    const ffmpegPath = ffmpegBin.path.replace('app.asar', 'app.asar.unpacked').replace('dist', 'node_modules/ffmpeg-static-electron');
-    ffmpeg.setFfmpegPath(ffmpegPath);
+
+  // TODO: FIX str.split is not a function
+  getAudioVolumes(stream: Readable | FS.WriteStream): Observable<IVolumes> {
+    return of({maxVolume:'1', meanVolume: '0.5'});
+
+    ffmpeg.setFfmpegPath(this.ffmpegPath);
 
     return new Observable((observer: NextObserver<IVolumes>) => {
       const that = this;
-
       ffmpeg(stream)
         .withAudioFilter('volumedetect')
         .addOption('-f', 'null')
@@ -39,13 +45,13 @@ export class MediaService {
         .on('end', (stdout: any, stderr: string) => {
           const max = that.parseVolume(stderr, 'max_volume:');
           const mean = that.parseVolume(stderr, 'mean_volume:');
-          console.log('volume analysis done');
+          console.log('volume analysis done, MeanDB is ', mean);
           observer.next({meanVolume: mean, maxVolume: max});
           observer.complete();
         })
         // .output('output.mp4')
         // .run();
-        .save();
+        .save('/dev/null');
     });
   }
 
