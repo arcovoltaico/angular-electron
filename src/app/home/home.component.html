@@ -6,12 +6,21 @@
   <button (click)="downloadYoutubeVideo('Wch3gJG2GJ4')">1 sec</button>
   <button (click)="downloadYoutubeVideo('QohH89Eu5iM')">5 secs</button>
   <button (click)="downloadYoutubeVideo('C7OQHIpDlvA')">1 min</button>
-  <button (click)="downloadYoutubeVideo('tvQsyxLR7tk')">>1min</button>
-  <div class="result"*ngIf="mainVolume">
+  <button (click)="downloadYoutubeVideo('tvQsyxLR7tk')">Buggles</button>
+  <button (click)="downloadYoutubeVideo('YwFsY9HDYKw')">Blinded</button>
+
+  <div class="result" *ngIf="mainVolume">
     Main Volume is {{mainVolume}}
   </div>
 
-  npm run electron:build
+
+  <div>
+    The video will be downloaded to your user folder.
+  </div>
+<!--  <div>-->
+<!--    To build the app:-->
+<!--    npm run electron:build-->
+<!--  </div>-->
 
 
 </div>

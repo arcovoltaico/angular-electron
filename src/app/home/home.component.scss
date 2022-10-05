@@ -2,12 +2,17 @@
 
 }
 
-div.result {
-  color: white !important;
-  font-size: 16pt;
-  padding: 8px;
-}
-button {
-  margin:8px;
-}
+div.container {
+  div {
+    color: white;
+    margin: 8px;
+  }
 
+  div.result {
+    font-size: 16pt;
+  }
+
+  button {
+    margin: 8px;
+  }
+}

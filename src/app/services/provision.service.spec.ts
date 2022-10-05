@@ -12,7 +12,7 @@ describe('ProvisionService', function () {
   it('#getStream should return a promise on video 1sec',
     (done: DoneFn) => {
       const id = 'Wch3gJG2GJ4';  // 1 sec video
-      service.getStreamObservable(id).subscribe(stream => {
+      service.getStream(id).subscribe(stream => {
         expect(stream).toBeInstanceOf(PassThrough);
         done();
       });
@@ -21,7 +21,16 @@ describe('ProvisionService', function () {
   it('#getStream should return a promise on long video',
     (done: DoneFn) => {
       const id = 'tvQsyxLR7tk';  // Buggles: TechnoPop
-      service.getStreamObservable(id).subscribe(stream => {
+      service.getStream(id).subscribe(stream => {
+        expect(stream).toBeInstanceOf(PassThrough);
+        done();
+      });
+    });
+
+  it('#getStreamWithInfo should return a promise on long video',
+    (done: DoneFn) => {
+      const id = 'tvQsyxLR7tk';  // Buggles: TechnoPop
+      service.getStreamWithInfo(id).subscribe(stream => {
         expect(stream).toBeInstanceOf(PassThrough);
         done();
       });

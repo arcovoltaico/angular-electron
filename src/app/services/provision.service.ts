@@ -8,13 +8,9 @@ const fs: typeof FS = window.require('fs');
 
 @Injectable()
 export class ProvisionService {
-  path: string;
 
-  setPath(path: string) {
-    this.path = path;
-  }
 
-  getStreamObservable(url: string): Observable<any> {
+  getStream(url: string): Observable<any> {
     console.log('getting stream observable');
 
     const stream = ytdl(url);
@@ -25,10 +21,8 @@ export class ProvisionService {
         obs.error(e);
       });
 
-      stream.on('end', () => {
-        console.log('stream has ENDED');
-        obs.next(stream);
-        obs.complete();
+      stream.on('progress', (length, downloaded, totallength) => {
+        console.log({length, downloaded, totallength}); // not logging
       });
 
       stream.on('finish', () => {
@@ -59,5 +53,55 @@ export class ProvisionService {
     });
   }
 
+  getStreamWithInfo(url: string): Observable<any> {
+    console.log('getting stream observable');
+    return new Observable((observer: NextObserver<any>) => {
+      // const url = 'https://www.youtube.com/watch?v=' + location;
+      ytdl.getInfo(url).then(
+        info => {
+          console.log(info.formats);
+          const formats = ytdl.filterFormats(info.formats, 'audioandvideo');
+
+          if (formats.length < 1) {
+            console.log('no formats retrieved');
+            observer.error('Video formats not available');
+            return;
+          } else {
+            // this.stopRetry = true;
+          }
+          console.log(formats);
+          const downloadOptions = {
+            quality: 'highest',
+            format: formats[0]
+          };
+
+          const stream = ytdl.downloadFromInfo(info, downloadOptions);
+          stream.on('error', (e) => {
+            console.log('stream has ERRORED', e.toString());
+            observer.error(e);
+          });
+
+          stream.on('progress', (length, downloaded, totallength) => {
+            console.log({length, downloaded, totallength}); // not logging
+          });
+
+          stream.on('finish', () => {
+            console.log('stream has FINISHED');
+            observer.next(stream);
+            observer.complete();
+          });
+        }
+        ,
+        error => {
+          console.error(error);
+          alert('Video info not available:');
+          console.log('stream has ERRORED', error.toString());
+          observer.error(error);
+          throw new Error('Video info not available');
+        }
+      );
+    });
+  }
 
 }
+
