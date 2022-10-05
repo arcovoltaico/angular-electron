@@ -2,8 +2,16 @@
   <h1 class="title">
     {{ 'PAGES.HOME.TITLE' | translate }}
   </h1>
-  <button (click)="downloadYoutubeVideo()">Download Youtube Video</button>
-  Main Volume is {{mainVolume}}
 
-  <a routerLink="/detail">{{ 'PAGES.HOME.GO_TO_DETAIL' | translate }}</a>
+  <button (click)="downloadYoutubeVideo('Wch3gJG2GJ4')">1 sec</button>
+  <button (click)="downloadYoutubeVideo('QohH89Eu5iM')">5 secs</button>
+  <button (click)="downloadYoutubeVideo('C7OQHIpDlvA')">1 min</button>
+  <button (click)="downloadYoutubeVideo('tvQsyxLR7tk')">>1min</button>
+  <div class="result"*ngIf="mainVolume">
+    Main Volume is {{mainVolume}}
+  </div>
+
+  npm run electron:build
+
+
 </div>

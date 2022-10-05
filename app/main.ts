@@ -6,6 +6,10 @@ let win: BrowserWindow = null;
 const args = process.argv.slice(1),
   serve = args.some(val => val === '--serve');
 
+const homePath = app.getPath('home')
+const tempPath = app.getPath('temp')
+const paths = {homePath: homePath, tempPath: tempPath}
+
 function createWindow(): BrowserWindow {
 
   const size = screen.getPrimaryDisplay().workAreaSize;
@@ -14,7 +18,7 @@ function createWindow(): BrowserWindow {
   win = new BrowserWindow({
     x: 0,
     y: 0,
-    width: size.width,
+    width: 600,
     height: size.height,
     webPreferences: {
       nodeIntegration: true,
@@ -45,7 +49,13 @@ function createWindow(): BrowserWindow {
     debug();
 
     require('electron-reloader')(module);
-    win.loadURL('http://localhost:4200');
+    win.loadURL('http://localhost:4200').then(r => {
+      // we send the homePath (local user directory) and temp because we will need it on app.component and provision service
+      win.webContents.send('showMainWindow', paths);
+    });
+
+
+
   } else {
     // Path when running electron executable
     let pathIndex = './index.html';
@@ -56,7 +66,10 @@ function createWindow(): BrowserWindow {
     }
 
     const url = new URL(path.join('file:', __dirname, pathIndex));
-    win.loadURL(url.href);
+    win.loadURL(url.href).then(r => {
+      // we send the homePath (local user directory) and temp because we will need it on app.component and provision service
+      win.webContents.send('showMainWindow', paths);
+    });
   }
 
   // Emitted when the window is closed.
@@ -67,7 +80,12 @@ function createWindow(): BrowserWindow {
     win = null;
   });
 
-  return win;
+  win.once('ready-to-show', () => {
+    win.webContents.openDevTools(); // DEBUG EVEN WHEN COMPILED
+  });
+  
+
+return win;
 }
 
 try {
@@ -76,6 +94,7 @@ try {
   // Some APIs can only be used after this event occurs.
   // Added 400 ms to fix the black background issue while using transparent window. More detais at https://github.com/electron/electron/issues/15947
   app.on('ready', () => setTimeout(createWindow, 400));
+
 
   // Quit when all windows are closed.
   app.on('window-all-closed', () => {

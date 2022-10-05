@@ -1,33 +1,31 @@
 import {ProvisionService} from './provision.service';
 import {PassThrough} from 'stream';
-import {WriteStream} from 'fs';
-import {MediaService} from './media.service';
 
 
-describe('ProvisionService', function() {
+describe('ProvisionService', function () {
   let service: ProvisionService;
   beforeEach(() => {
-    service = new ProvisionService(new MediaService());
+    service = new ProvisionService();
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 999999;
   });
 
-  it('#getStreamPromise should return a promise',
+  it('#getStream should return a promise on video 1sec',
     (done: DoneFn) => {
-      const id = 'https://www.youtube.com/watch?v=Wch3gJG2GJ4';
-      service.getStreamPromise(id).then(value => {
-        expect(value).toBeInstanceOf(PassThrough);
+      const id = 'Wch3gJG2GJ4';  // 1 sec video
+      service.getStreamObservable(id).subscribe(stream => {
+        expect(stream).toBeInstanceOf(PassThrough);
         done();
       });
     });
 
-  it('#downloadVideo returns a WriteStream',
+  it('#getStream should return a promise on long video',
     (done: DoneFn) => {
-      //   const id = "tvQsyxLR7tk"; // technopop
-      const id = 'Wch3gJG2GJ4'; // 1 sec video
-      service.downloadVideo(id).subscribe(value => {
-        expect(value).toBeInstanceOf(WriteStream);
+      const id = 'tvQsyxLR7tk';  // Buggles: TechnoPop
+      service.getStreamObservable(id).subscribe(stream => {
+        expect(stream).toBeInstanceOf(PassThrough);
         done();
       });
     });
+
 
 });

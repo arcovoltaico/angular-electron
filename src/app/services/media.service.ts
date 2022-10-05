@@ -17,10 +17,8 @@ export class MediaService {
     .replace('node_modules/electron/dist/Electron.app/Contents/Resources/electron.asar/renderer/bin', 'bin')
     .replace('bin', 'node_modules/ffmpeg-static-electron/bin');
 
-
-  // TODO: FIX str.split is not a function
   getAudioVolumes(stream: Readable | FS.WriteStream): Observable<IVolumes> {
-    return of({maxVolume:'1', meanVolume: '0.5'});
+    return of({maxVolume: '1', meanVolume: '0.5'});
 
     ffmpeg.setFfmpegPath(this.ffmpegPath);
 
@@ -37,7 +35,6 @@ export class MediaService {
         })
 
         .on('error', function (err) {
-          // IT WILL ERROR UNLESS ELECTRON IS COMPILED ! so impossible to test?
           console.log('An error occurred while analysing: ' + err.message);
           observer.error('DBs are not accessible');
         })
@@ -49,8 +46,6 @@ export class MediaService {
           observer.next({meanVolume: mean, maxVolume: max});
           observer.complete();
         })
-        // .output('output.mp4')
-        // .run();
         .save('/dev/null');
     });
   }

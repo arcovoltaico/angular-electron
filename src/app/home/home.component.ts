@@ -2,8 +2,6 @@ import {Component, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 import {MediaService} from '../services/media.service';
 import {ProvisionService} from '../services/provision.service';
-import {WriteStream} from "fs";
-import {Readable} from "stream";
 
 @Component({
   selector: 'app-home',
@@ -21,23 +19,35 @@ export class HomeComponent implements OnInit {
     console.log('HomeComponent INIT');
   }
 
-  downloadYoutubeVideo(youTubeId: string = 'tvQsyxLR7tk') {
-    this.provisionService.downloadVideo(youTubeId)
-      .subscribe(
-        (stream) => {
-          console.log(stream);
-          console.log('VIDEO DATA is here');
-          // TODO:  TO UPDATE WHEN TESTS ARE OK
-          // this.analiseDbs(stream);
-        });
+  downloadYoutubeVideo(youTubeId: string) {
+    this.mainVolume = null;
+    const observable$ = this.provisionService.getStreamObservable(youTubeId);
+    const observer = {
+      next: (stream) => {
+        this.provisionService.writeStreamToFile(youTubeId+'.mp4', stream)
+          .subscribe((file) => {
+            console.log('File copied', file);
+          });
+
+        console.log('analysing STREAM');
+        this.mediaService.getAudioVolumes(stream)
+          .subscribe(
+            (data) => {
+              console.log(data);
+              this.mainVolume = data.meanVolume;
+            });
+      },
+      error: (error: Error) => {
+        console.error(error.message);
+      },
+      complete: () => {
+        console.log('Get Stream is completed');
+      },
+    };
+
+    observable$.subscribe(observer);
   }
 
-  analiseDbs(stream) {
-    this.mediaService.getAudioVolumes(stream)
-      .subscribe(
-        (data) => {
-          this.mainVolume = data.meanVolume;
-        });
-  }
+
 
 }
