@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {NextObserver, Observable, of} from 'rxjs';
+import {NextObserver, Observable} from 'rxjs';
 import ffmpeg from 'fluent-ffmpeg-corrected';
 import * as ffmpegBin from 'ffmpeg-static-electron';
 import FS from 'fs';
@@ -18,7 +18,6 @@ export class MediaService {
     .replace('bin', 'node_modules/ffmpeg-static-electron/bin');
 
   getAudioVolumes(stream: Readable | FS.WriteStream): Observable<IVolumes> {
-    return of({maxVolume: '1', meanVolume: '0.5'});
 
     ffmpeg.setFfmpegPath(this.ffmpegPath);
 
