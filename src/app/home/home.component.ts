@@ -50,6 +50,10 @@ export class HomeComponent implements OnInit {
     observable$.subscribe(observer);
   }
 
+  plainDownload(id: string){
+    this.provisionService.basicDownload(id);
+  }
+
 
 
 }

@@ -18,6 +18,17 @@ describe('ProvisionService', function () {
       });
     });
 
+
+  it('#getStreamWithInfo  (alternativate method) should return a promise on video 1sec',
+    (done: DoneFn) => {
+      const id = 'Wch3gJG2GJ4';  // 1 sec video
+      service.getStreamWithInfo(id).subscribe(stream => {
+        expect(stream).toBeInstanceOf(PassThrough);
+        done();
+      });
+    });
+
+  // TODO: test exhausted as the download never finish
   it('#getStream should return a promise on long video',
     (done: DoneFn) => {
       const id = 'tvQsyxLR7tk';  // Buggles: TechnoPop
@@ -27,6 +38,7 @@ describe('ProvisionService', function () {
       });
     });
 
+  // TODO: test exhausted as the download never finish
   it('#getStreamWithInfo should return a promise on long video',
     (done: DoneFn) => {
       const id = 'tvQsyxLR7tk';  // Buggles: TechnoPop

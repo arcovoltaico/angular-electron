@@ -35,7 +35,8 @@ export class ProvisionService {
 
   writeStreamToFile(filename, stream): Observable<any> {
     console.log('Copying stream into file');
-    const file = fs.createWriteStream(Config.homePath + '/' + filename);
+    const filepath = Config.homePath? Config.homePath + '/' + filename : filename;
+    const file = fs.createWriteStream(filepath);
     stream.pipe(file);
     return new Observable((obs: NextObserver<any>) => {
       file.on('error', (e) => {
@@ -53,6 +54,7 @@ export class ProvisionService {
     });
   }
 
+  //Alternative method to getStream
   getStreamWithInfo(url: string): Observable<any> {
     console.log('getting stream observable');
     return new Observable((observer: NextObserver<any>) => {
@@ -102,6 +104,13 @@ export class ProvisionService {
       );
     });
   }
+
+  // plain download to project folder
+  basicDownload(id: string){
+    ytdl(id)
+      .pipe(fs.createWriteStream(id+'.mp4'));
+  }
+
 
 }
 
