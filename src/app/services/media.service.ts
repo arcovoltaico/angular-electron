@@ -18,7 +18,7 @@ export class MediaService {
     .replace('bin', 'node_modules/ffmpeg-static-electron/bin');
 
   getAudioVolumes(stream: Readable | FS.WriteStream): Observable<IVolumes> {
-
+    console.log('analysing STREAM');
     ffmpeg.setFfmpegPath(this.ffmpegPath);
 
     return new Observable((observer: NextObserver<IVolumes>) => {

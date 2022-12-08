@@ -28,15 +28,16 @@ export class HomeComponent implements OnInit {
         this.provisionService.writeStreamToFile(youTubeId+'.mp4', stream)
           .subscribe((file) => {
             console.log('File copied', file);
+            this.mediaService.getAudioVolumes(file)
+              .subscribe(
+                (data) => {
+                  console.log(data);
+                  this.mainVolume = data.meanVolume;
+                });
           });
 
-        console.log('analysing STREAM');
-        this.mediaService.getAudioVolumes(stream)
-          .subscribe(
-            (data) => {
-              console.log(data);
-              this.mainVolume = data.meanVolume;
-            });
+
+
       },
       error: (error: Error) => {
         console.error(error.message);
