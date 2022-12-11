@@ -15,17 +15,16 @@ export interface IVolumes {
 @Injectable()
 export class MediaService {
   binPath = 'node_modules/ffmpeg-static-electron/bin';
-  binPathOS = this.binPath + '/mac/x64'; // TODO: platform hardcoded!
   ffmpegPath = ffmpegBin.path
-    .replace('node_modules/electron/dist/Electron.app/Contents/Resources/electron.asar/renderer/bin/browser/javascript', this.binPathOS)
-    .replace('app.asar', 'app.asar.unpacked')
-    .replace ('node_modules/electron/dist/Electron.app/Contents/Resources/electron.asar/renderer/bin', this.binPath)
+    .replace('app.asar/bin', 'app.asar.unpacked/' + this.binPath)
+    .replace('node_modules/electron/dist/Electron.app/Contents/Resources/electron.asar/renderer/bin', this.binPath)
+    .replace('browser/javascript', 'mac/x64') // TODO: platform hardcoded!
   ;
-  // 1st replace for the npm start executed one
-  // 2st replace for the build version, with asar: true on electron-builder.json
+  // 1st replacement for the build version, with asar: true on electron-builder.json
   // amd the 2 ffmpeg dependencies  on the app/package.json
   // it detects the platform on build time (not sure if in M1 arm64 yet)
-  // the 3rd replacement is for unit tests
+
+  // the other 2 replacements for the unit test and the  npm start executed
 
   getAudioVolumes(stream: Readable | FS.WriteStream): Observable<IVolumes> {
     console.log('analysing STREAM');

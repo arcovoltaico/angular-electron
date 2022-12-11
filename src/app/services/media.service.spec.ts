@@ -32,4 +32,12 @@ describe('MediaService', function () {
     done();
   });
 
+  it('#getAudioVolumesSync should return volumes from video file', (done) => {
+    const filepath = 'bSpJxBXlkgU.mp4';
+    const result = mediaService.getAudioVolumesSync(filepath);
+    // expect(result).toEqual(1);
+    done();
+  });
+
+
 });

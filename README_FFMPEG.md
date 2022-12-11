@@ -87,8 +87,15 @@ The service
 
 
 ### TO-DO :
-1. check that the binary is accesible when running as browser by `npm start`  
 
-2. How to unit test it with a local file?    `Cannot read properties of undefined (reading 'isStream')`
+CRITICAL :
+Build the app by `npm run electron:build`
+Run it, and click the Download Kraftwerk Button
 
-3. ON Build Testing downloading the first button  Why I have the **dev/null** error?
+` An error occurred while analysing: Output format null is not available`
+
+
+OTHER
+
+1. Make a unit test using a local mp4
+2. Not getting the error when running `npm start`. Is it impossible to run ffmpeg  that way?
