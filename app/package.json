@@ -1,13 +1,10 @@
 {
-  "name": "angular-electron",
-  "description": "Angular Electron sample",
-  "author": {
-    "name": "Maxime GRIS",
-    "email": "maxime.gris@gmail.com"
-  },
-  "version": "11.1.0",
+  "name": "U-Vox",
+  "version": "10.5.0",
   "main": "main.js",
   "private": true,
   "dependencies": {
+    "ffmpeg-static-electron": "2.0.3",
+    "fluent-ffmpeg-corrected": "1.0.0"
   }
 }

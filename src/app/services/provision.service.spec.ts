@@ -1,13 +1,20 @@
 import {ProvisionService} from './provision.service';
 import {PassThrough} from 'stream';
+import {MediaService} from "./media.service";
 
 
 describe('ProvisionService', function () {
   let service: ProvisionService;
   beforeEach(() => {
-    service = new ProvisionService();
+    service = new ProvisionService(new MediaService());
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 999999;
   });
+
+  it('#basicDownload should return a promise on Kraftwerk Video',
+    (done: DoneFn) => {
+      const id = 'bSpJxBXlkgU';  //Kraftwerk
+      service.basicDownload(id);
+    });
 
   it('#getStream should return a promise on video 1sec',
     (done: DoneFn) => {

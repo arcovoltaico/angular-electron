@@ -4,6 +4,7 @@ import ffmpeg from 'fluent-ffmpeg-corrected';
 import * as ffmpegBin from 'ffmpeg-static-electron';
 import FS from 'fs';
 import {Readable} from 'stream';
+import {Config} from "../shared/config";
 
 export interface IVolumes {
   meanVolume: string;
@@ -13,12 +14,22 @@ export interface IVolumes {
 
 @Injectable()
 export class MediaService {
+  binPath = 'node_modules/ffmpeg-static-electron/bin';
+  binPathOS = this.binPath + '/mac/x64'; // TODO: platform hardcoded!
   ffmpegPath = ffmpegBin.path
-    .replace('node_modules/electron/dist/Electron.app/Contents/Resources/electron.asar/renderer/bin', 'bin')
-    .replace('bin', 'node_modules/ffmpeg-static-electron/bin');
+    .replace('node_modules/electron/dist/Electron.app/Contents/Resources/electron.asar/renderer/bin/browser/javascript', this.binPathOS)
+    .replace('app.asar', 'app.asar.unpacked')
+    .replace ('node_modules/electron/dist/Electron.app/Contents/Resources/electron.asar/renderer/bin', this.binPath)
+  ;
+  // 1st replace for the npm start executed one
+  // 2st replace for the build version, with asar: true on electron-builder.json
+  // amd the 2 ffmpeg dependencies  on the app/package.json
+  // it detects the platform on build time (not sure if in M1 arm64 yet)
+  // the 3rd replacement is for unit tests
 
   getAudioVolumes(stream: Readable | FS.WriteStream): Observable<IVolumes> {
     console.log('analysing STREAM');
+    console.log(this.ffmpegPath);
     ffmpeg.setFfmpegPath(this.ffmpegPath);
 
     return new Observable((observer: NextObserver<IVolumes>) => {
@@ -47,6 +58,37 @@ export class MediaService {
         })
         .save('/dev/null');
     });
+  }
+
+
+  getAudioVolumesSync(stream: Readable | FS.WriteStream | string) {
+    console.log('analysing STREAM');
+    ffmpeg.setFfmpegPath(this.ffmpegPath);
+
+    const that = this;
+    ffmpeg(stream)
+      .withAudioFilter('volumedetect')
+      .addOption('-f', 'null')
+      .audioBitrate(128)
+
+      .on('progress', function (progress) {
+        console.log(progress);
+        console.log('Normalising Processing: ' + progress.percent + '% done');
+      })
+
+      .on('error', function (err) {
+        console.error('An error occurred while analysing: ' + err.message);
+        new Error('DBs are not accessible');
+      })
+
+      .on('end', (stdout: any, stderr: string) => {
+        const max = that.parseVolume(stderr, 'max_volume:');
+        const mean = that.parseVolume(stderr, 'mean_volume:');
+        console.log('volume analysis done, MeanDB is ', mean);
+        return ({meanVolume: mean, maxVolume: max});
+      })
+      .save('/dev/null');
+
   }
 
 

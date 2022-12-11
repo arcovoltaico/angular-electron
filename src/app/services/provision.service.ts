@@ -3,17 +3,17 @@ import {NextObserver, Observable} from 'rxjs';
 import ytdl from 'ytdl-core';
 import * as FS from 'fs';
 import {Config} from '../shared/config';
-
+import { MediaService } from './media.service';
 const fs: typeof FS = window.require('fs');
 
 @Injectable()
 export class ProvisionService {
 
+  constructor(private mediaService: MediaService) { }
 
   getStream(url: string): Observable<any> {
-    console.log('getting stream observable');
-
     const stream = ytdl(url);
+
 
     return new Observable((obs: NextObserver<any>) => {
       stream.on('error', (e) => {
@@ -22,7 +22,12 @@ export class ProvisionService {
       });
 
       stream.on('progress', (length, downloaded, totallength) => {
-        console.log({length, downloaded, totallength}); // not logging
+        console.log({length, downloaded, totallength});
+        if (downloaded === totallength){
+          console.log('stream has PROGRESSED');
+          obs.next(stream);
+          obs.complete();
+        }
       });
 
       stream.on('finish', () => {
@@ -84,14 +89,19 @@ export class ProvisionService {
           });
 
           stream.on('progress', (length, downloaded, totallength) => {
-            console.log({length, downloaded, totallength}); // not logging
+            console.log({length, downloaded, totallength});
+            if (downloaded === totallength){
+              console.log('stream has PROGRESSED');
+              observer.next(stream);
+              observer.complete();
+            }
+
           });
 
           stream.on('finish', () => {
             console.log('stream has FINISHED');
-            observer.next(stream);
-            observer.complete();
           });
+
         }
         ,
         error => {
@@ -107,9 +117,27 @@ export class ProvisionService {
 
   // plain download to project folder
   basicDownload(id: string){
-    ytdl(id)
-      .pipe(fs.createWriteStream(id+'.mp4'));
+    //https://www.w3schools.com/nodejs/ref_readline.asp
+    // https://github.com/fent/node-ytdl-core/blob/mas ter/example/convert_to_mp3.js
+    //https://github.com/fent/node-ytdl-core/blob/master/example/ffmpeg.js
+    const filename = id+'.mp4';
+    const filepath = Config.homePath? Config.homePath + '/' + filename : filename;
+    const stream =  ytdl(id).pipe(fs.createWriteStream(filepath));
+
+    stream.on('finish', (data) => {
+      console.log(stream);
+      this.mediaService.getAudioVolumes(stream).subscribe((d) => {console.log('done', d);});
+    });
   }
+
+  basicDownloadSync(id: string){
+    const stream =  ytdl(id);
+    console.log(stream);
+    this.mediaService.getAudioVolumesSync(stream);
+
+  }
+
+
 
 
 }

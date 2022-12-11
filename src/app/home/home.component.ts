@@ -22,7 +22,7 @@ export class HomeComponent implements OnInit {
   downloadYoutubeVideo(youTubeId: string) {
     this.mainVolume = null;
     // const observable$ = this.provisionService.getStream(youTubeId);
-    const observable$ = this.provisionService.getStreamWithInfo(youTubeId);
+    const observable$ = this.provisionService.getStream(youTubeId);
     const observer = {
       next: (stream) => {
         this.provisionService.writeStreamToFile(youTubeId+'.mp4', stream)
