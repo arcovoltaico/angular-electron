@@ -47,10 +47,11 @@ The service
     @Injectable()
     export class MediaService {
       ffmpegPath = ffmpegBin.path
-      .replace('node_modules/electron/dist/Electron.app/Contents/Resources/electron.asar/renderer/bin', 'bin')
-      .replace('app.asar', 'app.asar.unpacked') // for the build version, with asar: true on electron-builder.json
-      .replace('bin', 'node_modules/ffmpeg-static-electron/bin');
-    
+      .replace('app.asar/bin', 'app.asar.unpacked/' + this.binPath)
+      .replace('node_modules/electron/dist/Electron.app/Contents/Resources/electron.asar/renderer/bin', this.binPath)
+      .replace('browser/javascript', 'mac/x64') // TODO: platform hardcoded!
+      ;
+
     getAudioVolumes(stream: Readable | FS.WriteStream): Observable<IVolumes> {
       if (!Config.isElectron){
       this.ffmpegPath= 'node_modules/ffmpeg-static-electron/bin/mac/x64/ffmpeg';
