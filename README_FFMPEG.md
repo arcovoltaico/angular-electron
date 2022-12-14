@@ -90,6 +90,8 @@ The service
 ### TO-DO :
 
 CRITICAL :
+https://stackoverflow.com/questions/74798085/ffmpeg-is-not-working-on-my-electron-angular-app
+
 Build the app by `npm run electron:build`
 Run it, and click the Download Kraftwerk Button
 
