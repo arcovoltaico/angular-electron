@@ -3,14 +3,33 @@ import {NextObserver, Observable} from 'rxjs';
 import ytdl from 'ytdl-core';
 import * as FS from 'fs';
 import {Config} from '../shared/config';
-import { MediaService } from './media.service';
+import {MediaService} from './media.service';
+
 const fs: typeof FS = window.require('fs');
 
 @Injectable()
 export class ProvisionService {
 
-  constructor(private mediaService: MediaService) { }
+  constructor(private mediaService: MediaService) {
+  }
 
+  basicDownload(id: string) {
+    //https://www.w3schools.com/nodejs/ref_readline.asp
+    // https://github.com/fent/node-ytdl-core/blob/mas ter/example/convert_to_mp3.js
+    //https://github.com/fent/node-ytdl-core/blob/master/example/ffmpeg.js
+    const filename = id + '.mp4';
+    const filepath = Config.homePath ? Config.homePath + '/' + filename : filename;
+    const stream = ytdl(id).pipe(fs.createWriteStream(filepath));
+
+    stream.on('finish', (data) => {
+      console.log(stream);
+      this.mediaService.getAudioVolumes(stream).subscribe((d) => {
+        console.log('done', d);
+      });
+    });
+  }
+
+  //Alternative method to getStreamInfo, not being used now
   getStream(url: string): Observable<any> {
     const stream = ytdl(url);
 
@@ -23,7 +42,7 @@ export class ProvisionService {
 
       stream.on('progress', (length, downloaded, totallength) => {
         console.log({length, downloaded, totallength});
-        if (downloaded === totallength){
+        if (downloaded === totallength) {
           console.log('stream has PROGRESSED');
           obs.next(stream);
           obs.complete();
@@ -38,28 +57,6 @@ export class ProvisionService {
     });
   }
 
-  writeStreamToFile(filename, stream): Observable<any> {
-    console.log('Copying stream into file');
-    const filepath = Config.homePath? Config.homePath + '/' + filename : filename;
-    const file = fs.createWriteStream(filepath);
-    stream.pipe(file);
-    return new Observable((obs: NextObserver<any>) => {
-      file.on('error', (e) => {
-        console.log('file has not been downloaded ', e.toString());
-        file.close();
-        obs.error(e);
-      });
-
-      file.on('finish', () => {
-        file.close();
-        console.log('file has  been downloaded ');
-        obs.next(file);
-        obs.complete();
-      });
-    });
-  }
-
-  //Alternative method to getStream
   getStreamWithInfo(url: string): Observable<any> {
     console.log('getting stream observable');
     return new Observable((observer: NextObserver<any>) => {
@@ -90,7 +87,7 @@ export class ProvisionService {
 
           stream.on('progress', (length, downloaded, totallength) => {
             console.log({length, downloaded, totallength});
-            if (downloaded === totallength){
+            if (downloaded === totallength) {
               console.log('stream has PROGRESSED');
               observer.next(stream);
               observer.complete();
@@ -115,30 +112,26 @@ export class ProvisionService {
     });
   }
 
-  // plain download to project folder
-  basicDownload(id: string){
-    //https://www.w3schools.com/nodejs/ref_readline.asp
-    // https://github.com/fent/node-ytdl-core/blob/mas ter/example/convert_to_mp3.js
-    //https://github.com/fent/node-ytdl-core/blob/master/example/ffmpeg.js
-    const filename = id+'.mp4';
-    const filepath = Config.homePath? Config.homePath + '/' + filename : filename;
-    const stream =  ytdl(id).pipe(fs.createWriteStream(filepath));
+  writeStreamToFile(filename, stream): Observable<any> {
+    console.log('Copying stream into file');
+    const filepath = Config.homePath ? Config.homePath + '/' + filename : filename;
+    const file = fs.createWriteStream(filepath);
+    stream.pipe(file);
+    return new Observable((obs: NextObserver<any>) => {
+      file.on('error', (e) => {
+        console.log('file has not been downloaded ', e.toString());
+        file.close();
+        obs.error(e);
+      });
 
-    stream.on('finish', (data) => {
-      console.log(stream);
-      this.mediaService.getAudioVolumes(stream).subscribe((d) => {console.log('done', d);});
+      file.on('finish', () => {
+        file.close();
+        console.log('file has  been downloaded ');
+        obs.next(file);
+        obs.complete();
+      });
     });
   }
-
-  basicDownloadSync(id: string){
-    const stream =  ytdl(id);
-    console.log(stream);
-    this.mediaService.getAudioVolumesSync(stream);
-
-  }
-
-
-
 
 }
 
