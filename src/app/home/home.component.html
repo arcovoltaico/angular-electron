@@ -6,10 +6,14 @@
     {{ 'PAGES.HOME.TITLE' | translate }}
   </h1>
 
-  <button (click)="plainDownload('bSpJxBXlkgU')">BasicDownload Kraftwerk</button>
-  <button (click)="downloadYoutubeVideo('bSpJxBXlkgU')">Kraftwerk</button>
-  <button (click)="downloadYoutubeVideo('tvQsyxLR7tk')">Buggles</button>
-  <button (click)="downloadYoutubeVideo('YwFsY9HDYKw')">Blinded</button>
+ <h2>BasicDownload</h2>
+  <button (click)="plainDownload('bSpJxBXlkgU')">Kraftwerk Works</button>
+  <button (click)="plainDownload('tvQsyxLR7tk')">Buggles Does not</button>
+
+  <h2>getStreamWithInfoDownload</h2>
+  <button (click)="downloadYoutubeVideo('bSpJxBXlkgU')">Kraftwerk Works</button>
+  <button (click)="downloadYoutubeVideo('tvQsyxLR7tk')">Buggles Does not</button>
+  <button (click)="downloadYoutubeVideo('YwFsY9HDYKw')">Blinded Does not</button>
 
   <div class="result" *ngIf="mainVolume">
     Main Volume is {{mainVolume}}
