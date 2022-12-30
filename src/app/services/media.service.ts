@@ -26,24 +26,24 @@ export class MediaService {
 
   // the other 2 replacements for the unit test and the  npm start executed
 
-  getAudioVolumes(stream: Readable | FS.WriteStream | FS.ReadStream): Observable<IVolumes> {
+  getAudioVolumes(stream: FS.WriteStream): Observable<IVolumes> {
     console.log('analysing STREAM');
     console.log(this.ffmpegPath);
     ffmpeg.setFfmpegPath(this.ffmpegPath);
 
     return new Observable((observer: NextObserver<IVolumes>) => {
       const that = this;
-      ffmpeg(stream)
+      ffmpeg(stream.path)
         .withAudioFilter('volumedetect')
         .addOption('-f', 'null')
         .audioBitrate(128)
 
-        .on('progress', function (progress) {
+        .on('progress', function(progress) {
           console.log(progress);
           console.log('Normalising Processing: ' + progress.percent + '% done');
         })
 
-        .on('error', function (err) {
+        .on('error', function(err) {
           console.log('An error occurred while analysing: ' + err.message);
           observer.error('DBs are not accessible');
         })
