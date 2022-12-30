@@ -26,7 +26,7 @@ export class MediaService {
 
   // the other 2 replacements for the unit test and the  npm start executed
 
-  getAudioVolumes(stream: Readable | FS.WriteStream): Observable<IVolumes> {
+  getAudioVolumes(stream: Readable | FS.WriteStream | FS.ReadStream): Observable<IVolumes> {
     console.log('analysing STREAM');
     console.log(this.ffmpegPath);
     ffmpeg.setFfmpegPath(this.ffmpegPath);
@@ -60,7 +60,7 @@ export class MediaService {
   }
 
 
-  getAudioVolumesSync(stream: Readable | FS.WriteStream | string) {
+  getAudioVolumesSync(stream: Readable | FS.WriteStream | FS.ReadStream | string) {
     console.log('analysing STREAM');
     ffmpeg.setFfmpegPath(this.ffmpegPath);
 
