@@ -1,20 +1,39 @@
 ## REQUISITES:
+https://stackoverflow.com/questions/74798085/ffmpeg-is-not-working-on-my-electron-angular-app
+
 1. Run this from the root of your electron project AND from its app/ folder  
 `npm i ffmpeg-static-electron`    
-`npm i fluent-ffmpeg-corrected`     
-   ####
-   The dependencies installed on the /app folder are the onesthat will be available unpacked inside your app build. 
-In this case, you will have the ffmepg binaries
-inside `Resources/app.asar.unpacked/node_modules/ffmpeg-static-electron`   
-2. ### Activate Asar the Builder 
+`npm i fluent-ffmpeg-corrected`  
+`npm install buffer -D`   
+`npm install webpack -D`
+
+    The dependencies installed on the /app folder are the onesthat will be available unpacked inside your app build. 
+        In this case, you will have the ffmepg binaries
+        inside `Resources/app.asar.unpacked/node_modules/ffmpeg-static-electron`   
+3. ### Activate Asar the Builder 
    On the first level of `electron-builder.json` we need to be sure asar 
    is not false (true is the default) `"asar": true`
-3. ### Tweak yoru dependencies
+4. ### Tweak your dependencies
    We need to hack the following node modules package.json by adding :
 - **fluent-ffmpeg-corrected**
   `"browser": { "fs": false, "child_process": false }`,
 - **isexe**:  
   `"browser": { "fs": false}`
+
+4. ### Update angular.webpack.js
+   We need to add the following :
+   ```
+   const webpack = require("webpack");
+   
+   config.plugins = [
+   ...config.plugins,
+   new webpack.ProvidePlugin({
+   Buffer: ['buffer', 'Buffer'],
+   }),
+   new NodePolyfillPlugin({
+   excludeAliases: ["console"]
+   })
+   ];
 
 ### IMPLEMENTING NORMALISATION
 
@@ -52,7 +71,7 @@ The service
       .replace('browser/javascript', 'mac/x64') // TODO: platform hardcoded!
       ;
 
-    getAudioVolumes(stream: Readable | FS.WriteStream): Observable<IVolumes> {
+    getAudioVolumes(stream: FS.WriteStream): Observable<IVolumes> {
       if (!Config.isElectron){
       this.ffmpegPath= 'node_modules/ffmpeg-static-electron/bin/mac/x64/ffmpeg';
       }
@@ -60,7 +79,7 @@ The service
       
           return new Observable((observer: NextObserver<IVolumes>) => {
             const that = this;
-            ffmpeg(stream)
+            ffmpeg(stream.path)
               .withAudioFilter('volumedetect')
               .addOption('-f', 'null')
               .audioBitrate(128)
@@ -88,17 +107,5 @@ The service
 
 
 ### TO-DO :
-
-CRITICAL :
-https://stackoverflow.com/questions/74798085/ffmpeg-is-not-working-on-my-electron-angular-app
-
-Build the app by `npm run electron:build`
-Run it, and click the Download Kraftwerk Button
-
-` An error occurred while analysing: Output format null is not available`
-
-
-OTHER
-
-1. Make a unit test using a local mp4
-2. Not getting the error when running `npm start`. Is it impossible to run ffmpeg  that way?
+Is it possible to make a unit test with a local mp4?
+Is it possible to use ffmpeg from npm start?
