@@ -36,12 +36,12 @@ export class MediaService {
         .addOption('-f', 'null')
         .audioBitrate(128)
 
-        .on('progress', function (progress) {
+        .on('progress', function(progress) {
           console.log(progress);
           console.log('Normalising Processing', progress);
         })
 
-        .on('error', function (err) {
+        .on('error', function(err) {
           console.log('An error occurred while analysing: ' + err.message);
           observer.error('DBs are not accessible');
         })
