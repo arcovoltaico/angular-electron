@@ -3,8 +3,6 @@ import {NextObserver, Observable} from 'rxjs';
 import ffmpeg from 'fluent-ffmpeg-corrected';
 import * as ffmpegBin from 'ffmpeg-static-electron';
 import FS from 'fs';
-import {Readable} from 'stream';
-import {Config} from "../shared/config";
 
 export interface IVolumes {
   meanVolume: string;
@@ -38,12 +36,12 @@ export class MediaService {
         .addOption('-f', 'null')
         .audioBitrate(128)
 
-        .on('progress', function(progress) {
+        .on('progress', function (progress) {
           console.log(progress);
-          console.log('Normalising Processing: ' + progress.percent + '% done');
+          console.log('Normalising Processing', progress);
         })
 
-        .on('error', function(err) {
+        .on('error', function (err) {
           console.log('An error occurred while analysing: ' + err.message);
           observer.error('DBs are not accessible');
         })
@@ -58,38 +56,6 @@ export class MediaService {
         .save('/dev/null');
     });
   }
-
-
-  getAudioVolumesSync(stream: Readable | FS.WriteStream | FS.ReadStream | string) {
-    console.log('analysing STREAM');
-    ffmpeg.setFfmpegPath(this.ffmpegPath);
-
-    const that = this;
-    ffmpeg(stream)
-      .withAudioFilter('volumedetect')
-      .addOption('-f', 'null')
-      .audioBitrate(128)
-
-      .on('progress', function (progress) {
-        console.log(progress);
-        console.log('Normalising Processing: ' + progress.percent + '% done');
-      })
-
-      .on('error', function (err) {
-        console.error('An error occurred while analysing: ' + err.message);
-        new Error('DBs are not accessible');
-      })
-
-      .on('end', (stdout: any, stderr: string) => {
-        const max = that.parseVolume(stderr, 'max_volume:');
-        const mean = that.parseVolume(stderr, 'mean_volume:');
-        console.log('volume analysis done, MeanDB is ', mean);
-        return ({meanVolume: mean, maxVolume: max});
-      })
-      .save('/dev/null');
-
-  }
-
 
   // it gets the value of mean or max volume,
   // by getting the fragment after mean_volume: and before the first dB appearance

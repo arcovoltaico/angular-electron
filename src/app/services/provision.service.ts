@@ -13,50 +13,6 @@ export class ProvisionService {
   constructor(private mediaService: MediaService) {
   }
 
-  basicDownload(id: string) {
-    //https://www.w3schools.com/nodejs/ref_readline.asp
-    // https://github.com/fent/node-ytdl-core/blob/mas ter/example/convert_to_mp3.js
-    //https://github.com/fent/node-ytdl-core/blob/master/example/ffmpeg.js
-    const filename = id + '.mp4';
-    const filepath = Config.homePath ? Config.homePath + '/' + filename : filename;
-    const stream = ytdl(id).pipe(fs.createWriteStream(filepath));
-
-    stream.on('finish', (data) => {
-      console.log(stream);
-      this.mediaService.getAudioVolumes(stream).subscribe((d) => {
-        console.log('done', d);
-      });
-    });
-  }
-
-  //Alternative method to getStreamInfo, not being used now
-  getStream(url: string): Observable<any> {
-    const stream = ytdl(url);
-
-
-    return new Observable((obs: NextObserver<any>) => {
-      stream.on('error', (e) => {
-        console.log('stream has ERRORED', e.toString());
-        obs.error(e);
-      });
-
-      stream.on('progress', (length, downloaded, totallength) => {
-        console.log({length, downloaded, totallength});
-        if (downloaded === totallength) {
-          console.log('stream has PROGRESSED');
-          obs.next(stream);
-          obs.complete();
-        }
-      });
-
-      stream.on('finish', () => {
-        console.log('stream has FINISHED');
-        obs.next(stream);
-        obs.complete();
-      });
-    });
-  }
-
   getStreamWithInfo(url: string): Observable<any> {
     console.log('getting stream observable');
     return new Observable((observer: NextObserver<any>) => {
@@ -80,25 +36,7 @@ export class ProvisionService {
           };
 
           const stream = ytdl.downloadFromInfo(info, downloadOptions);
-          stream.on('error', (e) => {
-            console.log('stream has ERRORED', e.toString());
-            observer.error(e);
-          });
-
-          stream.on('progress', (length, downloaded, totallength) => {
-            console.log({length, downloaded, totallength});
-            if (downloaded === totallength) {
-              console.log('stream has PROGRESSED');
-              observer.next(stream);
-              observer.complete();
-            }
-
-          });
-
-          stream.on('finish', () => {
-            console.log('stream has FINISHED');
-          });
-
+          observer.next(stream); //Here you pass the stream directly
         }
         ,
         error => {

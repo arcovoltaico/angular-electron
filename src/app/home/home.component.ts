@@ -25,7 +25,7 @@ export class HomeComponent implements OnInit {
     const observable$ = this.provisionService.getStreamWithInfo(youTubeId);
     const observer = {
       next: (stream) => {
-        this.provisionService.writeStreamToFile(youTubeId+'.mp4', stream)
+        this.provisionService.writeStreamToFile(youTubeId + '.mp4', stream)
           .subscribe((file) => {
             console.log('File copied', file);
             this.mediaService.getAudioVolumes(file)
@@ -35,7 +35,6 @@ export class HomeComponent implements OnInit {
                   this.mainVolume = data.meanVolume;
                 });
           });
-
 
 
       },
@@ -49,11 +48,5 @@ export class HomeComponent implements OnInit {
 
     observable$.subscribe(observer);
   }
-
-  plainDownload(id: string){
-    this.provisionService.basicDownload(id);
-  }
-
-
 
 }

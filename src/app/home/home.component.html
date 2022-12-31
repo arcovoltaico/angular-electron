@@ -1,28 +1,16 @@
 <div class="container">
-
-
-
   <h1 class="title">
     {{ 'PAGES.HOME.TITLE' | translate }}
   </h1>
 
- <h2>BasicDownload</h2>
-  <button (click)="plainDownload('bSpJxBXlkgU')">Kraftwerk Works</button>
-  <button (click)="plainDownload('tvQsyxLR7tk')">Buggles Does not</button>
-
-  <h2>getStreamWithInfoDownload</h2>
-  <button (click)="downloadYoutubeVideo('bSpJxBXlkgU')">Kraftwerk Works</button>
-  <button (click)="downloadYoutubeVideo('tvQsyxLR7tk')">Buggles Does not</button>
-  <button (click)="downloadYoutubeVideo('YwFsY9HDYKw')">Blinded Does not</button>
+  <h2>DOWNLOAD</h2>
+  <button (click)="downloadYoutubeVideo('bSpJxBXlkgU')">Kraftwerk</button>
+  <button (click)="downloadYoutubeVideo('tvQsyxLR7tk')">The Buggles</button>
+  <button (click)="downloadYoutubeVideo('YwFsY9HDYKw')">Blinded By Passion</button>
 
   <div class="result" *ngIf="mainVolume">
     Main Volume is {{mainVolume}}
   </div>
 
-
-  <div>
-    The video will be downloaded to the project or your user folder.
-  </div>
-
-
+  <div>The video will be downloaded to the project or your user folder.</div>
 </div>
