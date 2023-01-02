@@ -2,23 +2,39 @@
 https://stackoverflow.com/questions/74798085/ffmpeg-is-not-working-on-my-electron-angular-app
 
 1. Run this from the root of your electron project AND from its app/ folder  
-`npm i ffmpeg-static-electron`    
-`npm i fluent-ffmpeg-corrected`  
-`npm install buffer -D`   
-`npm install webpack -D`
+   `npm i ffmpeg-static-electron`    
+   `npm i fluent-ffmpeg-corrected`  
+   `npm install buffer -D`   
+   `npm install webpack -D`
 
-    The dependencies installed on the /app folder are the onesthat will be available unpacked inside your app build. 
-        In this case, you will have the ffmepg binaries
-        inside `Resources/app.asar.unpacked/node_modules/ffmpeg-static-electron`   
-3. ### Activate Asar the Builder 
-   On the first level of `electron-builder.json` we need to be sure asar 
+   The dependencies installed on the /app folder are the onesthat will be available unpacked inside your app build.
+   In this case, you will have the ffmepg binaries
+   inside `Resources/app.asar.unpacked/node_modules/ffmpeg-static-electron`
+2. ### Activate Asar the Builder
+   On the first level of `electron-builder.json` we need to be sure asar
    is not false (true is the default) `"asar": true`
-4. ### Tweak your dependencies
-   We need to hack the following node modules package.json by adding :
+3. ### Tweak your dependencies
+Initially I needed to hack the following node modules package.json by adding :
 - **fluent-ffmpeg-corrected**
   `"browser": { "fs": false, "child_process": false }`,
 - **isexe**:  
   `"browser": { "fs": false}`
+
+To avoid, this ugly hack, I forked the libraries, so I use them
+on the package.json:
+
+`"fluent-ffmpeg-corrected": "github:arcovoltaico/fluent-ffmpeg-corrected",`
+
+and on devDependencies :   
+`"isexe": "github:arcovoltaico/isexe",`
+
+
+TODO: point again to the original repo if my PR is approved
+[isexe PR](https://github.com/isaacs/isexe/pull/30)
+
+The fluent-ffmpeg-corrected github is 404, so no fork there possible.
+
+
 
 4. ### Update angular.webpack.js
    We need to add the following :
@@ -51,7 +67,7 @@ The component method
 
 
 The service
-    
+
     import ffmpeg from 'fluent-ffmpeg-corrected';
     import * as ffmpegBin from 'ffmpeg-static-electron';
     import FS from 'fs';
